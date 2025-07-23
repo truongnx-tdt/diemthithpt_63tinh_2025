@@ -1,23 +1,32 @@
 <!-- Loading Spinner -->
-<div *ngIf="loading" class="loading-overlay">
-  <div class="spinner"></div>
-  <p>Đang tải dữ liệu...</p>
+<div *ngIf="shouldShowInitializationProgress()" class="loading-overlay">
+  <div class="loading-content">
+    <div class="spinner"></div>
+    <div class="loading-info">
+      <p>{{ loadingProgress }}</p>
+      <small>Lần đầu tải có thể mất vài phút để cache dữ liệu</small>
+      <div class="cache-info" *ngIf="cacheInfo.isCached">
+        <small>Cache: {{ getCacheSize() }} - {{ getCacheStatusText() }}</small>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Main Container -->
-<div class="container">
+<div class="container" [class.loading]="loading">
   <!-- Header -->
   <header class="header">
     <h1>Hệ thống Tra cứu Điểm Thi THPT Quốc Gia</h1>
     <div class="controls">
-      <button (click)="refreshData()" class="refresh-btn" [disabled]="loading">
-        🔄 Làm mới
+      <button (click)="refreshData()" class="refresh-btn" [disabled]="loading || !initializationComplete">
+        <span *ngIf="!loading">🔄 Làm mới</span>
+        <span *ngIf="loading">⏳ Đang tải...</span>
       </button>
     </div>
   </header>
 
   <!-- Tab Navigation -->
-  <nav class="tab-nav">
+  <nav class="tab-nav" *ngIf="initializationComplete">
     <button [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')" class="tab-btn">
       📊 Tổng quan
     </button>
@@ -32,276 +41,283 @@
     </button>
   </nav>
 
-  <!-- Overview Tab -->
-  <div *ngIf="activeTab === 'overview'" class="tab-content">
-    <!-- Filter Controls -->
-    <div class="filter-section">
-      <div class="filter-group">
-        <label for="province">Chọn tỉnh:</label>
-        <select id="province" [(ngModel)]="selectedProvince" (change)="onProvinceChange()">
-          <option value="">Tất cả tỉnh</option>
-          <option *ngFor="let province of provinces" [value]="province.ma_tinh">
-            {{province.ten_tinh}}
-          </option>
-        </select>
+  <!-- Content Area (only show when initialization is complete) -->
+  <div *ngIf="initializationComplete" class="main-content">
+
+    <!-- Overview Tab -->
+    <div *ngIf="activeTab === 'overview'" class="tab-content">
+      <!-- Filter Controls -->
+      <div class="filter-section">
+        <div class="filter-group">
+          <label for="province">Chọn tỉnh:</label>
+          <select id="province" [(ngModel)]="selectedProvince" (change)="onProvinceChange()" [disabled]="loading">
+            <option value="">Tất cả tỉnh</option>
+            <option *ngFor="let province of provinces" [value]="province.ma_tinh">
+              {{province.ten_tinh}}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="subject">Chọn môn:</label>
+          <select id="subject" [(ngModel)]="selectedSubject" (change)="onSubjectChange()" [disabled]="loading">
+            <option *ngFor="let subject of getAvailableSubjects()" [value]="subject">
+              {{getSubjectDisplayName(subject)}}
+            </option>
+          </select>
+        </div>
       </div>
 
-      <div class="filter-group">
-        <label for="subject">Chọn môn:</label>
-        <select id="subject" [(ngModel)]="selectedSubject" (change)="onSubjectChange()">
-          <option *ngFor="let subject of getAvailableSubjects()" [value]="subject">
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <div class="card">
+          <h3>Tổng số thí sinh</h3>
+          <p class="number">{{getTotalStudents() | number}}</p>
+        </div>
+        <div class="card">
+          <h3>Số tỉnh/thành</h3>
+          <p class="number">{{getProvinceCount()}}</p>
+        </div>
+        <div class="card">
+          <h3>Tổng số môn thi</h3>
+          <p class="number">{{getSubjectCount()}}</p>
+        </div>
+      </div>
+
+      <!-- Top Provinces Chart -->
+      <div class="chart-section">
+        <h3>Top 10 tỉnh có điểm trung bình cao nhất - {{getSubjectDisplayName(selectedSubject)}}</h3>
+        <div class="chart-container">
+          <div class="bar-chart" *ngIf="topProvinces && topProvinces.length > 0; else noData">
+            <div *ngFor="let item of topProvinces" class="bar-item">
+              <div class="bar-label">{{item.province}}</div>
+              <div class="bar-wrapper">
+                <div class="bar" [style.height.%]="(item.average / 10) * 100"></div>
+                <span class="bar-value">{{item.average | number:'1.2-2'}}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noData>
+            <div class="no-data">Không có dữ liệu để hiển thị</div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Tab -->
+    <div *ngIf="activeTab === 'search'" class="tab-content">
+      <div class="search-section">
+        <h3>Tìm kiếm theo số báo danh</h3>
+        <div class="search-controls">
+          <input type="text" [(ngModel)]="searchSBD" placeholder="Nhập số báo danh (8 chữ số)..." class="search-input"
+            maxlength="8" (keyup.enter)="searchStudent()" [disabled]="loading">
+          <button (click)="searchStudent()" class="search-btn" [disabled]="!searchSBD.trim() || loading">
+            <span *ngIf="!loading">🔍 Tìm kiếm</span>
+            <span *ngIf="loading">⏳ Đang tìm...</span>
+          </button>
+          <button (click)="clearSearch()" class="clear-btn" [disabled]="loading">
+            Xóa
+          </button>
+        </div>
+
+        <!-- Search Results -->
+        <div *ngIf="searchResult" class="search-results">
+          <div class="result-card">
+            <h4>Kết quả tìm kiếm</h4>
+            <p><strong>Số báo danh:</strong> {{searchResult.student.SBD}}</p>
+            <p><strong>Tỉnh/Thành:</strong> {{searchResult.province}}</p>
+
+            <div class="scores-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Môn học</th>
+                    <th>Điểm</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let subject of getAvailableSubjects()">
+                    <td>{{getSubjectDisplayName(subject)}}</td>
+                    <td [class.high-score]="+searchResult.student[subject] >= 8"
+                      [class.medium-score]="+searchResult.student[subject] >= 5 && +searchResult.student[subject] < 8"
+                      [class.low-score]="+searchResult.student[subject] > 0 && +searchResult.student[subject] < 5">
+                      {{
+                      searchResult.student[subject] === -1 || searchResult.student[subject] === 0 ||
+                      searchResult.student[subject] === null
+                      ? 'Không thi'
+                      : searchResult.student[subject]
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="searchHaveData" class="no-results">
+          <p>❌ Không tìm thấy thí sinh với số báo danh: <strong>{{searchSBD}}</strong></p>
+          <small>Vui lòng kiểm tra lại số báo danh (8 chữ số)</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Tab -->
+    <div *ngIf="activeTab === 'statistics'" class="tab-content">
+      <div class="statistics-section">
+        <h3>Thống kê chi tiết theo tỉnh</h3>
+
+        <!-- Subject Selection -->
+        <div class="subject-tabs">
+          <button *ngFor="let subject of getAvailableSubjects()" [class.active]="selectedSubject === subject"
+            (click)="selectedSubject = subject; onSubjectChange()" class="subject-tab" [disabled]="loading">
             {{getSubjectDisplayName(subject)}}
-          </option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Summary Cards -->
-    <div class="summary-cards">
-      <div class="card">
-        <h3>Tổng số thí sinh</h3>
-        <p class="number">{{getTotalStudents() | number}}</p>
-      </div>
-      <div class="card">
-        <h3>Số tỉnh/thành</h3>
-        <p class="number">{{getProvinceCount()}}</p>
-      </div>
-      <div class="card">
-        <h3>Điểm cao nhất</h3>
-        <p class="number">{{getHighestAverage() | number:'1.2-2'}}</p>
-      </div>
-      <div class="card">
-        <h3>Tổng số môn thi</h3>
-        <p class="number">{{getSubjectCount()}}</p>
-      </div>
-    </div>
-
-    <!-- Top Provinces Chart -->
-    <div class="chart-section">
-      <h3>Top 10 tỉnh có điểm trung bình cao nhất - {{getSubjectDisplayName(selectedSubject)}}</h3>
-      <div class="chart-container">
-        <div class="bar-chart">
-          <div *ngFor="let item of topProvinces" class="bar-item">
-            <div class="bar-label">{{item.province}}</div>
-            <div class="bar-wrapper">
-              <div class="bar" [style.height.%]="(item.average / 10) * 100"></div>
-              <span class="bar-value">{{item.average | number:'1.2-2'}}</span>
-            </div>
-          </div>
+          </button>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Search Tab -->
-  <div *ngIf="activeTab === 'search'" class="tab-content">
-    <div class="search-section">
-      <h3>Tìm kiếm theo số báo danh</h3>
-      <div class="search-controls">
-        <input type="text" [(ngModel)]="searchSBD" placeholder="Nhập số báo danh..." class="search-input">
-        <button (click)="searchStudent()" class="search-btn" [disabled]="!searchSBD.trim()">
-          Tìm kiếm
-        </button>
-        <button (click)="clearSearch()" class="clear-btn">
-          Xóa
-        </button>
-      </div>
-
-      <!-- Search Results -->
-      <div *ngIf="searchResult" class="search-results">
-        <div class="result-card">
-          <h4>Kết quả tìm kiếm</h4>
-          <p><strong>Số báo danh:</strong> {{searchResult.student.SBD}}</p>
-          <p><strong>Tỉnh/Thành:</strong> {{searchResult.province}}</p>
-
-          <div class="scores-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Môn học</th>
-                  <th>Điểm</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let subject of getAvailableSubjects()">
-                  <td>{{getSubjectDisplayName(subject)}}</td>
-                  <td [class.high-score]="+searchResult.student[subject] >= 8"
-                    [class.low-score]="+searchResult.student[subject] < 5">
-                    {{ searchResult.student[subject] === -1 ? 'Không thi' : searchResult.student[subject] }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <!-- Statistics Table -->
+        <div class="statistics-table" *ngIf="getSubjectStats(selectedSubject).length > 0; else noStatsData">
+          <table>
+            <thead>
+              <tr>
+                <th>Tỉnh/Thành</th>
+                <th>Số thí sinh thi</th>
+                <th>Điểm TB</th>
+                <th>Điểm cao nhất</th>
+                <th>Số thí sinh điểm cao nhất</th>
+                <th>Điểm thấp nhất</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let stat of getSubjectStats(selectedSubject); trackBy: trackByProvince">
+                <td class="province-name">{{stat.province}}</td>
+                <td>{{stat.count | number}}</td>
+                <td [class.high-score]="stat.average >= 7" [class.medium-score]="stat.average >= 5 && stat.average < 7"
+                  [class.low-score]="stat.average < 5">
+                  {{stat.average | number:'1.2-2'}}
+                </td>
+                <td>{{stat.max | number:'1.2-2'}}</td>
+                <td>{{stat.maxCount | number}}</td>
+                <td>{{stat.min | number:'1.2-2'}}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      <div *ngIf="searchHaveData" class="no-results">
-        <p>Không tìm thấy thí sinh với số báo danh: {{searchSBD}}</p>
-      </div>
-    </div>
-  </div>
+        <ng-template #noStatsData>
+          <div class="no-data">Không có dữ liệu thống kê cho môn {{getSubjectDisplayName(selectedSubject)}}</div>
+        </ng-template>
 
-  <!-- Statistics Tab -->
-  <div *ngIf="activeTab === 'statistics'" class="tab-content">
-    <div class="statistics-section">
-      <h3>Thống kê chi tiết theo tỉnh</h3>
-
-      <!-- Subject Selection -->
-      <div class="subject-tabs">
-        <button *ngFor="let subject of getAvailableSubjects()" [class.active]="selectedSubject === subject"
-          (click)="selectedSubject = subject; onSubjectChange()" class="subject-tab">
-          {{getSubjectDisplayName(subject)}}
-        </button>
-      </div>
-
-      <!-- Statistics Table -->
-      <div class="statistics-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Tỉnh/Thành</th>
-              <th>Tổng thí sinh</th>
-              <th>Điểm TB</th>
-              <th>Điểm cao nhất</th>
-              <th>Điểm thấp nhất</th>
-              <th>Số thí sinh thi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- <tr *ngFor="let stat of getSubjectStats(selectedSubject); trackBy: trackByProvince">
-              <td>{{stat.province}}</td>
-              <td>{{stat.count | number}}</td>
-              <td [class.high-score]="stat.average >= 7" [class.low-score]="stat.average < 5">
-                {{stat.average | number:'1.2-2'}}
-              </td>
-              <td>{{stat.max | number:'1.2-2'}}</td>
-              <td>{{stat.min | number:'1.2-2'}}</td>
-              <td>{{stat.count | number}}</td>
-            </tr> -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Score Distribution -->
-      <div class="distribution-section">
-        <h4>Phân bố điểm {{getSubjectDisplayName(selectedSubject)}}</h4>
-        <!-- <div class="distribution-chart">
-          <div *ngFor="let range of getScoreDistribution(selectedSubject)" class="distribution-bar">
-            <div class="range-label">{{range.range}}</div>
-            <div class="progress-bar">
-              <div class="progress-fill" [style.width.%]="range.percentage"></div>
-            </div>
-            <div class="range-stats">
-              <span>{{range.count | number}} ({{range.percentage | number:'1.1-1'}}%)</span>
-            </div>
-          </div>
-        </div> -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Comparison Tab -->
-  <div *ngIf="activeTab === 'comparison'" class="tab-content">
-    <div class="comparison-section">
-      <h3>So sánh điểm trung bình các môn</h3>
-
-      <!-- Province Comparison -->
-      <div class="comparison-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Tỉnh/Thành</th>
-              <th *ngFor="let subject of getAvailableSubjects()">
-                {{getSubjectDisplayName(subject)}}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let stat of getDetailedStats()">
-              <td class="province-name">{{stat.name}}</td>
-              <td *ngFor="let subject of getAvailableSubjects()"
-                [class.high-score]="getSubjectAverage(stat, subject) >= 7"
-                [class.medium-score]="getSubjectAverage(stat, subject) >= 5 && getSubjectAverage(stat, subject) < 7"
-                [class.low-score]="getSubjectAverage(stat, subject) < 5 && getSubjectAverage(stat, subject) > 0">
-                {{getSubjectAverage(stat, subject) > 0 ? (getSubjectAverage(stat, subject) | number:'1.2-2') : '-'}}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Subject Comparison Chart -->
-      <div class="subject-comparison">
-        <h4>Biểu đồ so sánh điểm trung bình các môn</h4>
-        <div class="radar-chart">
-          <div *ngFor="let subject of getAvailableSubjects()" class="subject-bar">
-            <div class="subject-label">{{getSubjectDisplayName(subject)}}</div>
-            <div class="subject-stats">
-              <div class="avg-bar">
-                <!-- <div class="avg-fill" [style.width.%]="(getOverallAverage(subject) / 10) * 100"></div>
-                <span>{{getOverallAverage(subject) | number:'1.2-2'}}</span> -->
+        <!-- Score Distribution -->
+        <div class="distribution-section" *ngIf="getScoreDistribution(selectedSubject).length > 0">
+          <h4>Phân bố điểm {{getSubjectDisplayName(selectedSubject)}}</h4>
+          <div class="distribution-chart">
+            <div *ngFor="let range of getScoreDistribution(selectedSubject)" class="distribution-bar">
+              <div class="range-label">{{range.range}}</div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="range.percentage"></div>
+              </div>
+              <div class="range-stats">
+                <span>{{range.count | number}} ({{range.percentage | number:'1.1-1'}}%)</span>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Top Performers -->
-      <div class="top-performers">
-        <h4>Top 5 tỉnh có điểm cao nhất từng môn</h4>
-        <div class="top-grid">
-          <div *ngFor="let subject of getAvailableSubjects()" class="top-subject">
-            <h5>{{getSubjectDisplayName(subject)}}</h5>
-            <ol>
-              <li *ngFor="let province of getTopProvinces(subject).slice(0, 5)">
-                {{province.name}} - {{province.average | number:'1.2-2'}}
-              </li>
-            </ol>
+    <!-- Comparison Tab -->
+    <div *ngIf="activeTab === 'comparison'" class="tab-content">
+      <div class="comparison-section">
+        <h3>So sánh điểm trung bình các môn</h3>
+
+        <!-- Province Comparison -->
+        <div class="comparison-table" *ngIf="getDetailedStats().length > 0; else noComparisonData">
+          <table>
+            <thead>
+              <tr>
+                <th>Tỉnh/Thành</th>
+                <th *ngFor="let subject of getAvailableSubjects()">
+                  {{getSubjectDisplayName(subject)}}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let stat of getDetailedStats()">
+                <td class="province-name">{{stat.name}}</td>
+                <td *ngFor="let subject of getAvailableSubjects()"
+                  [class.high-score]="getSubjectAverage(stat, subject) >= 7"
+                  [class.medium-score]="getSubjectAverage(stat, subject) >= 5 && getSubjectAverage(stat, subject) < 7"
+                  [class.low-score]="getSubjectAverage(stat, subject) < 5 && getSubjectAverage(stat, subject) > 0">
+                  {{getSubjectAverage(stat, subject) > 0 ? (getSubjectAverage(stat, subject) | number:'1.2-2') : '-'}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ng-template #noComparisonData>
+          <div class="no-data">Không có dữ liệu để so sánh</div>
+        </ng-template>
+
+        <!-- Subject Comparison Chart -->
+        <div class="subject-comparison" *ngIf="getAvailableSubjects().length > 0">
+          <h4>Biểu đồ so sánh điểm trung bình các môn</h4>
+          <div class="radar-chart">
+            <div *ngFor="let subject of getAvailableSubjects()" class="subject-bar">
+              <div class="subject-label">{{getSubjectDisplayName(subject)}}</div>
+              <div class="subject-stats">
+                <div class="avg-bar">
+                  <div class="avg-fill" [style.width.%]="(getOverallAverage(subject) / 10) * 100"></div>
+                  <span>{{getOverallAverage(subject) | number:'1.2-2'}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Performers -->
+        <div class="top-performers">
+          <h4>Top 5 tỉnh có điểm cao nhất từng môn</h4>
+          <div class="top-grid">
+            <div *ngFor="let subject of getAvailableSubjects()" class="top-subject">
+              <h5>{{getSubjectDisplayName(subject)}}</h5>
+              <ol *ngIf="getTopProvinces(subject).length > 0; else noTopData">
+                <li *ngFor="let province of getTopProvinces(subject).slice(0, 5)">
+                  {{province.name}} - {{province.average | number:'1.2-2'}}
+                </li>
+              </ol>
+              <ng-template #noTopData>
+                <p class="no-data-small">Không có dữ liệu</p>
+              </ng-template>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
 
-  <!-- Detailed Statistics Table -->
-  <div *ngIf="activeTab === 'details'" class="tab-content">
-    <div class="details-section">
-      <h3>Bảng thống kê chi tiết</h3>
-      <div class="detailed-table">
-        <table>
-          <thead>
-            <tr>
-              <th rowspan="2">Tỉnh/Thành</th>
-              <th rowspan="2">Tổng TS</th>
-              <th *ngFor="let subject of getAvailableSubjects()" colspan="3">
-                {{getSubjectDisplayName(subject)}}
-              </th>
-            </tr>
-            <tr>
-              <ng-container *ngFor="let subject of getAvailableSubjects()">
-                <th>TB</th>
-                <th>Max</th>
-                <th>Min</th>
-              </ng-container>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let stat of getDetailedStats()">
-              <td class="province-name">{{stat.name}}</td>
-              <td>{{stat.totalStudents | number}}</td>
-              <ng-container *ngFor="let subject of getAvailableSubjects()">
-                <td [class.high-score]="getSubjectAverage(stat, subject) >= 7"
-                  [class.low-score]="getSubjectAverage(stat, subject) < 5">
-                  {{getSubjectAverage(stat, subject) > 0 ? (getSubjectAverage(stat, subject) | number:'1.2-2') : '-'}}
-                </td>
-                <td>{{getSubjectMax(stat, subject) | number:'1.2-2'}}</td>
-                <td>{{getSubjectMin(stat, subject) | number:'1.2-2'}}</td>
-              </ng-container>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  <!-- Footer with system info -->
+  <footer class="footer" *ngIf="initializationComplete">
+    <div class="system-info">
+      <span>Hệ thống tra cứu điểm thi THPT Quốc Gia 2025</span>
+      <span class="separator">|</span>
+      <span>Dữ liệu: {{provinces.length}} tỉnh/thành cũ</span>
+      <span class="separator">|</span>
+      <span>Dữ liệu được tổng hợp tại <a href="https://github.com/harveycdr/DiemThiTHPT2025" target="_blank"
+          rel="noopener noreferrer" style="color: blue">Tuổi trẻ online</a>
+      </span>
+      <span class="separator">|</span>
+      <span>Dữ liệu được tổng hợp có thể không chính xác
+      </span>
     </div>
-  </div>
+    <div class="version-info">
+      <small>&copy; 2024 TDT Dev TechShop</small>
+      <span class="separator">|</span>
+      <small>Liên hệ fb: <a href="https://www.facebook.com/techshoptdt" target="_blank" rel="noopener noreferrer"
+          style="color: blue">TECH SHOP - TDT DEV</a></small>
+    </div>
+  </footer>
+
 </div>
