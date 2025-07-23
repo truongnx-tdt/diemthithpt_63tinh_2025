@@ -1,5 +1,8 @@
 Dữ liệu được tổng hợp và tham khảo tại: https://github.com/harveycdr/DiemThiTHPT2025
 
+<img width="1391" height="952" alt="image" src="https://github.com/user-attachments/assets/b245a12f-a7d2-45fa-ae43-59d2330bb97a" />
+
+
 # 🇻🇳 Crawl & Tổng hợp điểm thi THPT Quốc Gia 2025 - 63 Tỉnh Thành
 
 Dự án này thực hiện **thu thập và tổng hợp dữ liệu điểm thi THPT Quốc Gia năm 2025** từ 63 tỉnh/thành trên cả nước, lưu trữ dưới định dạng JSON để phục vụ mục đích phân tích, thống kê hoặc nghiên cứu học thuật.
