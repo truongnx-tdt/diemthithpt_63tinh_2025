@@ -1,5 +1,7 @@
 Dữ liệu được tổng hợp và tham khảo tại: https://github.com/harveycdr/DiemThiTHPT2025
 
+web xem điểm: https://diemthithpt2025.tdtgalaxy.id.vn/
+
 <img width="1391" height="952" alt="image" src="https://github.com/user-attachments/assets/b245a12f-a7d2-45fa-ae43-59d2330bb97a" />
 
 
