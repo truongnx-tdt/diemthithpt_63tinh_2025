@@ -1,59 +1,76 @@
-# ExamScore
+Dữ liệu được tổng hợp và tham khảo tại: https://github.com/harveycdr/DiemThiTHPT2025
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.9.
+# 🇻🇳 Crawl & Tổng hợp điểm thi THPT Quốc Gia 2025 - 63 Tỉnh Thành
 
-## Development server
+Dự án này thực hiện **thu thập và tổng hợp dữ liệu điểm thi THPT Quốc Gia năm 2025** từ 63 tỉnh/thành trên cả nước, lưu trữ dưới định dạng JSON để phục vụ mục đích phân tích, thống kê hoặc nghiên cứu học thuật.
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
+## 📁 Cấu trúc dữ liệu
+
+### 1. `data.json`
+
+Chứa danh sách mã tỉnh và tên đầy đủ của 63 tỉnh/thành:
+
+```json
+[
+  {
+    "ma_tinh": "01",
+    "ten_tinh": "THÀNH PHỐ HÀ NỘI"
+  }
+]
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 2. `exam_results_01.json`
 
-## Code scaffolding
+Là file dữ liệu điểm thi của từng tỉnh, ví dụ exam_results_01.json tương ứng với mã tỉnh 01 - THÀNH PHỐ HÀ NỘI. Cấu trúc gồm:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+```json
+{
+  "province_code": "01",
+  "province_name": "THÀNH PHỐ HÀ NỘI",
+  "total_records": 122973,
+  "expected_max_sbd": 125000,
+  "coverage_percentage": 98.38,
+  "export_time": "2025-07-21 08:51:59",
+  "crawl_stats": {
+    "total_requests": 124400,
+    "successful_requests": 124394,
+    "success_rate": 100,
+    "failed_sbds": 0
+  },
+  "data": [
+    {
+      "SBD": "01000001",
+      "TOAN": 5.75,
+      "VAN": 7.75,
+      "HOA": 7.75,
+      "SINH": 8.25,
+      "TONGDIEM": 29.5,
+      ...
+    }
+  ]
+}
+Các môn không thi sẽ có giá trị là -1.
 
-```bash
-ng generate component component-name
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 🎯 Mục tiêu dự án
+Thu thập dữ liệu điểm thi công khai từ các Sở GD&ĐT.
 
-```bash
-ng generate --help
-```
+Chuẩn hóa định dạng dữ liệu phục vụ:
 
-## Building
+Thống kê điểm theo tỉnh/thành
 
-To build the project run:
+Phân tích xu hướng điểm thi
 
-```bash
-ng build
-```
+Ứng dụng học máy và AI trong phân tích dữ liệu giáo dục
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Hỗ trợ cộng đồng học sinh, phụ huynh, giáo viên và lập trình viên.
 
-## Running unit tests
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 📜 Giấy phép & Trách nhiệm
+Dữ liệu được thu thập từ các nguồn công khai và sử dụng với mục đích phi thương mại. Vui lòng không sử dụng cho mục đích thương mại hoặc gây ảnh hưởng đến quyền riêng tư của thí sinh.
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 📬 Liên hệ
+Nếu bạn muốn đóng góp, báo lỗi hoặc có nhu cầu sử dụng dữ liệu, hãy mở issue hoặc liên hệ qua GitHub.
