@@ -1,0 +1,254 @@
+[
+    {
+        "ma_tinh": "01",
+        "ten_tinh": "THÀNH PHỐ HÀ NỘI"
+    },
+    {
+        "ma_tinh": "02",
+        "ten_tinh": "THÀNH PHỐ HỒ CHÍ MINH"
+    },
+    {
+        "ma_tinh": "03",
+        "ten_tinh": "THÀNH PHỐ HẢI PHÒNG"
+    },
+    {
+        "ma_tinh": "04",
+        "ten_tinh": "THÀNH PHỐ ĐÀ NẴNG"
+    },
+    {
+        "ma_tinh": "05",
+        "ten_tinh": "TỈNH HÀ GIANG"
+    },
+    {
+        "ma_tinh": "06",
+        "ten_tinh": "TỈNH CAO BẰNG"
+    },
+    {
+        "ma_tinh": "07",
+        "ten_tinh": "TỈNH LAI CHÂU"
+    },
+    {
+        "ma_tinh": "08",
+        "ten_tinh": "TỈNH LÀO CAI"
+    },
+    {
+        "ma_tinh": "09",
+        "ten_tinh": "TỈNH TUYÊN QUANG"
+    },
+    {
+        "ma_tinh": "10",
+        "ten_tinh": "LẠNG SƠN"
+    },
+    {
+        "ma_tinh": "11",
+        "ten_tinh": "TỈNH BẮC KẠN"
+    },
+    {
+        "ma_tinh": "12",
+        "ten_tinh": "TỈNH THÁI NGUYÊN"
+    },
+    {
+        "ma_tinh": "13",
+        "ten_tinh": "TỈNH YÊN BÁI"
+    },
+    {
+        "ma_tinh": "14",
+        "ten_tinh": "TỈNH SƠN LA"
+    },
+    {
+        "ma_tinh": "15",
+        "ten_tinh": "TỈNH PHÚ THỌ"
+    },
+    {
+        "ma_tinh": "16",
+        "ten_tinh": "TỈNH VĨNH PHÚC"
+    },
+    {
+        "ma_tinh": "17",
+        "ten_tinh": "TỈNH QUẢNG NINH"
+    },
+    {
+        "ma_tinh": "18",
+        "ten_tinh": "TỈNH BẮC GIANG"
+    },
+    {
+        "ma_tinh": "19",
+        "ten_tinh": "TỈNH BẮC NINH"
+    },
+    {
+        "ma_tinh": "21",
+        "ten_tinh": "TỈNH HẢI DƯƠNG"
+    },
+    {
+        "ma_tinh": "22",
+        "ten_tinh": "TỈNH HƯNG YÊN"
+    },
+    {
+        "ma_tinh": "23",
+        "ten_tinh": "TỈNH HÒA BÌNH"
+    },
+    {
+        "ma_tinh": "24",
+        "ten_tinh": "TỈNH HÀ NAM"
+    },
+    {
+        "ma_tinh": "25",
+        "ten_tinh": "TỈNH NAM ĐỊNH"
+    },
+    {
+        "ma_tinh": "26",
+        "ten_tinh": "TỈNH THÁI BÌNH"
+    },
+    {
+        "ma_tinh": "27",
+        "ten_tinh": "TỈNH NINH BÌNH"
+    },
+    {
+        "ma_tinh": "28",
+        "ten_tinh": "TỈNH THANH HÓA"
+    },
+    {
+        "ma_tinh": "29",
+        "ten_tinh": "TỈNH NGHỆ AN"
+    },
+    {
+        "ma_tinh": "30",
+        "ten_tinh": "TỈNH HÀ TĨNH"
+    },
+    {
+        "ma_tinh": "31",
+        "ten_tinh": "TỈNH QUẢNG BÌNH"
+    },
+    {
+        "ma_tinh": "32",
+        "ten_tinh": "TỈNH QUẢNG TRỊ"
+    },
+    {
+        "ma_tinh": "33",
+        "ten_tinh": "TỈNH THỪA THIÊN - HUẾ"
+    },
+    {
+        "ma_tinh": "34",
+        "ten_tinh": "TỈNH QUẢNG NAM"
+    },
+    {
+        "ma_tinh": "35",
+        "ten_tinh": "TỈNH QUẢNG NGÃI"
+    },
+    {
+        "ma_tinh": "36",
+        "ten_tinh": "TỈNH KON TUM"
+    },
+    {
+        "ma_tinh": "37",
+        "ten_tinh": "TỈNH BÌNH ĐỊNH"
+    },
+    {
+        "ma_tinh": "38",
+        "ten_tinh": "TỈNH GIA LAI"
+    },
+    {
+        "ma_tinh": "39",
+        "ten_tinh": "TỈNH PHÚ YÊN"
+    },
+    {
+        "ma_tinh": "40",
+        "ten_tinh": "TỈNH ĐĂK LĂK"
+    },
+    {
+        "ma_tinh": "41",
+        "ten_tinh": "TỈNH KHÁNH HÒA"
+    },
+    {
+        "ma_tinh": "42",
+        "ten_tinh": "TỈNH LÂM ĐỒNG"
+    },
+    {
+        "ma_tinh": "43",
+        "ten_tinh": "TỈNH BÌNH PHƯỚC"
+    },
+    {
+        "ma_tinh": "44",
+        "ten_tinh": "TỈNH BÌNH DƯƠNG"
+    },
+    {
+        "ma_tinh": "45",
+        "ten_tinh": "TỈNH NINH THUẬN"
+    },
+    {
+        "ma_tinh": "46",
+        "ten_tinh": "TỈNH TÂY NINH"
+    },
+    {
+        "ma_tinh": "47",
+        "ten_tinh": "TỈNH BÌNH THUẬN"
+    },
+    {
+        "ma_tinh": "48",
+        "ten_tinh": "TỈNH ĐỒNG NAI"
+    },
+    {
+        "ma_tinh": "49",
+        "ten_tinh": "TỈNH LONG AN"
+    },
+    {
+        "ma_tinh": "50",
+        "ten_tinh": "TỈNH ĐỒNG THÁP"
+    },
+    {
+        "ma_tinh": "51",
+        "ten_tinh": "TỈNH AN GIANG"
+    },
+    {
+        "ma_tinh": "52",
+        "ten_tinh": "TỈNH BÀ RỊA - VŨNG TÀU"
+    },
+    {
+        "ma_tinh": "53",
+        "ten_tinh": "TỈNH TIỀN GIANG"
+    },
+    {
+        "ma_tinh": "54",
+        "ten_tinh": "TỈNH KIÊN GIANG"
+    },
+    {
+        "ma_tinh": "55",
+        "ten_tinh": "THÀNH PHỐ CẦN THƠ"
+    },
+    {
+        "ma_tinh": "56",
+        "ten_tinh": "TỈNH BẾN TRE"
+    },
+    {
+        "ma_tinh": "57",
+        "ten_tinh": "TỈNH VĨNH LONG"
+    },
+    {
+        "ma_tinh": "58",
+        "ten_tinh": "TỈNH TRÀ VINH"
+    },
+    {
+        "ma_tinh": "59",
+        "ten_tinh": "TỈNH SÓC TRĂNG"
+    },
+    {
+        "ma_tinh": "60",
+        "ten_tinh": "TỈNH BẠC LIÊU"
+    },
+    {
+        "ma_tinh": "61",
+        "ten_tinh": "TỈNH CÀ MAU"
+    },
+    {
+        "ma_tinh": "62",
+        "ten_tinh": "TỈNH ĐIỆN BIÊN"
+    },
+    {
+        "ma_tinh": "63",
+        "ten_tinh": "TỈNH ĐĂK NÔNG"
+    },
+    {
+        "ma_tinh": "64",
+        "ten_tinh": "TỈNH HẬU GIANG"
+    }
+]
