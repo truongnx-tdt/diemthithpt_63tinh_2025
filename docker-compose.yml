@@ -24,14 +24,6 @@ services:
       - angular-app
     networks:
       - app-network
-      
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared_tunnel
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token eyJhIjoiYzY3MjMzYmI0ZWU3YWQ4MDZlMjJkYzY5ZjVlZTRiMDAiLCJ0IjoiY2Y5ZGI0MmUtODg3Yi00N2ZiLTljOTItY2UwOTI0ZmZlMmVmIiwicyI6Ik5qTm1ZbVk0TmpRdE1EazNNaTAwTVRoaExUazFORE10WkdJNU1URmtZbU0wWW1ZMSJ9
-    networks:
-        - app-network
 
 networks:
   app-network:
