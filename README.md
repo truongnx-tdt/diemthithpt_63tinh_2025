@@ -10,8 +10,21 @@ web xem điểm: https://diemthithpt2025.tdtgalaxy.id.vn/
 Dự án này thực hiện **thu thập và tổng hợp dữ liệu điểm thi THPT Quốc Gia năm 2025** từ 63 tỉnh/thành trên cả nước, lưu trữ dưới định dạng JSON để phục vụ mục đích phân tích, thống kê hoặc nghiên cứu học thuật.
 
 ---
+## BE sử dụng C# để crawl
 
-## 📁 Cấu trúc dữ liệu
+File crawl nằm trong folder BE
+
+Hướng dẫn chạy BE:
+
+Tạo Project C# Console APP
+
+Hệ thống sẽ đọc file data.json để lấy mã tỉnh
+
+Crawl data số lượng lớn có thể tăng thread lên hiện tại call api nhiều nên việc mất dự liệu là không tránh khỏi.
+
+---
+
+## 📁 Cấu trúc dữ liệu data nằm trong folder assets
 
 ### 1. `data.json`
 
